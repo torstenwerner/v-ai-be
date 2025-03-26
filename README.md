@@ -27,6 +27,8 @@ An older python example is available in [sudoku.py](sudoku.py).
 It is a design study for a web application that works with messages somewhat similar to email messages.
 Initially the message overview should be designed.
 
+The prototype is available at: [https://torstenwerner.github.io/v-ai-be/messaging.html](https://torstenwerner.github.io/v-ai-be/messaging.html).
+
 ### Prompt
 
 Please create a web application where the user can read, create, and answer messages similar to email messages.
