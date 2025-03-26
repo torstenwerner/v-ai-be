@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Webmail</title>
+    <style>
+        /* Basic Reset & Body Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #e9e9e9;
+            font-size: 0.9em;
+        }
+
+        button:hover {
+            background-color: #ddd;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Header Styling */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #d BDBDBD;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 10px; /* Add gap between items */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.4em;
+            color: #2c3e50;
+        }
+
+        .search-input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-width: 200px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mailbox-name {
+            font-weight: 500;
+            color: #555;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto; /* Allows scrolling if content exceeds viewport */
+        }
+
+        /* Message List Styling */
+        #message-list {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden; /* Keeps borders neat */
+             max-height: calc(100vh - 200px); /* Example max height, adjust as needed */
+            overflow-y: auto; /* Scroll within the list if needed */
+        }
+
+        .message-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .message-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .message-item.unread .message-details {
+             font-weight: bold;
+             color: #111; /* Darker color for unread */
+        }
+         /* Optional: Add a visual marker for unread */
+        .message-item.unread::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #3498db; /* Blue dot */
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+
+        .message-details {
+            display: flex;
+            gap: 15px; /* Space between sender and subject */
+            flex-grow: 1;
+            overflow: hidden; /* Prevent long text from breaking layout */
+            margin-right: 15px; /* Space before actions */
+        }
+
+        .sender, .subject {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sender {
+            flex-basis: 180px; /* Give sender a fixed width */
+            flex-shrink: 0;
+            color: #555;
+        }
+         .message-item.unread .sender {
+             color: #333; /* Slightly darker sender for unread */
+         }
+
+        .subject {
+            flex-grow: 1; /* Subject takes remaining space */
+            color: #666;
+        }
+        .message-item.unread .subject {
+             color: #222; /* Slightly darker subject for unread */
+         }
+
+
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0; /* Prevent actions from shrinking */
+        }
+
+        .message-actions button {
+            padding: 4px 8px;
+            font-size: 0.8em;
+            background-color: transparent;
+            border: 1px solid #ccc;
+        }
+         .message-actions button:hover {
+             background-color: #f0f0f0;
+             border-color: #bbb;
+         }
+
+        /* Pagination Styling */
+        #pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 0;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        #page-info {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Hide elements initially if needed */
+        #prev-page, #next-page {
+            /* display: none; Will be controlled by JS */
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-left">
+            <span class="logo">WebMail</span>
+            <input type="search" class="search-input" placeholder="Search messages...">
+            <button id="new-message-btn">New Message</button>
+        </div>
+        <div class="header-right">
+            <span class="mailbox-name">Tina Tisch</span>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div id="message-list">
+            </div>
+        <div id="pagination">
+            <button id="prev-page" disabled>Previous</button>
+            <span id="page-info">Page 1 of 1</span>
+            <button id="next-page" disabled>Next</button>
+        </div>
+    </main>
+
+    <script>
+        // --- Mock Data ---
+        const mockMessages = [];
+        const totalMockMessages = 75; // Create more than 50 to test pagination
+        for (let i = 1; i <= totalMockMessages; i++) {
+            mockMessages.push({
+                id: `msg-${i}`,
+                sender: `Sender ${i}`,
+                subject: `Subject for message ${i}: Discussing important topics`,
+                // body: `This is the body content for message ${i}.`, // Keep for future expansion
+                unread: true // Initially all are unread
+            });
+        }
+
+        // --- Application State ---
+        let messages = [...mockMessages]; // Working copy of messages
+        let currentPage = 1;
+        const messagesPerPage = 50;
+
+        // --- DOM Elements ---
+        const messageListContainer = document.getElementById('message-list');
+        const paginationContainer = document.getElementById('pagination');
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+        const pageInfoSpan = document.getElementById('page-info');
+        const newMessageBtn = document.getElementById('new-message-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // --- Functions ---
+
+        /**
+         * Renders the list of messages for the current page.
+         */
+        function renderMessages() {
+            messageListContainer.innerHTML = ''; // Clear existing messages
+
+            const startIndex = (currentPage - 1) * messagesPerPage;
+            const endIndex = startIndex + messagesPerPage;
+            const paginatedMessages = messages.slice(startIndex, endIndex);
+
+            if (paginatedMessages.length === 0 && currentPage > 1) {
+                // If deleting led to an empty page, go back
+                currentPage--;
+                renderMessages();
+                renderPagination();
+                return;
+            }
+
+            paginatedMessages.forEach(message => {
+                const messageItem = document.createElement('div');
+                messageItem.classList.add('message-item');
+                messageItem.dataset.messageId = message.id; // Store ID for easy access
+                if (message.unread) {
+                    messageItem.classList.add('unread');
+                }
+
+                // Message Details (Sender & Subject)
+                const detailsDiv = document.createElement('div');
+                detailsDiv.classList.add('message-details');
+
+                const senderSpan = document.createElement('span');
+                senderSpan.classList.add('sender');
+                senderSpan.textContent = message.sender;
+
+                const subjectSpan = document.createElement('span');
+                subjectSpan.classList.add('subject');
+                subjectSpan.textContent = message.subject;
+
+                detailsDiv.appendChild(senderSpan);
+                detailsDiv.appendChild(subjectSpan);
+
+                // Action Buttons
+                const actionsDiv = document.createElement('div');
+                actionsDiv.classList.add('message-actions');
+
+                const replyBtn = createActionButton('Reply', message.id, handleReply);
+                const forwardBtn = createActionButton('Forward', message.id, handleForward);
+                const exportBtn = createActionButton('Export', message.id, handleExport);
+                const deleteBtn = createActionButton('Delete', message.id, handleDelete);
+
+                actionsDiv.appendChild(replyBtn);
+                actionsDiv.appendChild(forwardBtn);
+                actionsDiv.appendChild(exportBtn);
+                actionsDiv.appendChild(deleteBtn);
+
+                // Append details and actions to the message item
+                messageItem.appendChild(detailsDiv);
+                messageItem.appendChild(actionsDiv);
+
+                // Add click listener to the entire row (excluding buttons)
+                messageItem.addEventListener('click', (event) => {
+                     // Only mark as read if the click wasn't on a button within the actions div
+                    if (!event.target.closest('.message-actions')) {
+                        markMessageAsRead(message.id);
+                    }
+                });
+
+                messageListContainer.appendChild(messageItem);
+            });
+             // Add a message if the list is empty
+            if(messages.length === 0) {
+                 messageListContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #777;">No messages in this mailbox.</p>';
+            }
+        }
+
+         /**
+         * Helper to create action buttons
+         */
+        function createActionButton(text, messageId, clickHandler) {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.dataset.messageId = messageId; // Associate button with message ID
+            button.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent row click event (mark as read)
+                clickHandler(messageId);
+            });
+            return button;
+        }
+
+
+        /**
+         * Updates the pagination controls based on current state.
+         */
+        function renderPagination() {
+            const totalMessages = messages.length;
+            const totalPages = Math.ceil(totalMessages / messagesPerPage);
+
+             if (totalMessages === 0) {
+                paginationContainer.style.display = 'none'; // Hide pagination if no messages
+                return;
+            } else {
+                 paginationContainer.style.display = 'flex'; // Show pagination if there are messages
+             }
+
+            pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages || totalPages === 0;
+
+        }
+
+        /**
+         * Marks a specific message as read.
+         * @param {string} messageId - The ID of the message to mark as read.
+         */
+        function markMessageAsRead(messageId) {
+            const messageIndex = messages.findIndex(msg => msg.id === messageId);
+            if (messageIndex !== -1 && messages[messageIndex].unread) {
+                messages[messageIndex].unread = false;
+                // Re-render only the affected item for efficiency (more complex)
+                // or re-render the whole list (simpler for now)
+                const messageElement = messageListContainer.querySelector(`.message-item[data-message-id="${messageId}"]`);
+                 if(messageElement) {
+                     messageElement.classList.remove('unread');
+                 }
+                // Note: We don't need to re-render the whole list if just toggling the class
+                // renderMessages(); // Re-rendering list is simpler but less efficient
+                // renderPagination(); // No change needed here
+                 console.log(`Marked message ${messageId} as read.`);
+            }
+        }
+
+        // --- Event Handlers ---
+
+        function handleNextPage() {
+            const totalPages = Math.ceil(messages.length / messagesPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderMessages();
+                renderPagination();
+            }
+        }
+
+        function handlePrevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderMessages();
+                renderPagination();
+            }
+        }
+
+        // Placeholder Action Handlers
+        function handleNewMessage() {
+            alert('Action: Create New Message (Not implemented)');
+            console.log('Action: Create New Message');
+        }
+
+        function handleLogout() {
+            alert('Action: Logout (Not implemented)');
+            console.log('Action: Logout');
+             // In a real app, this would redirect or clear session state
+        }
+
+        function handleReply(messageId) {
+            alert(`Action: Reply to message ${messageId} (Not implemented)`);
+            console.log(`Action: Reply to message ${messageId}`);
+        }
+
+        function handleForward(messageId) {
+            alert(`Action: Forward message ${messageId} (Not implemented)`);
+            console.log(`Action: Forward message ${messageId}`);
+        }
+
+        function handleExport(messageId) {
+            alert(`Action: Export message ${messageId} (Not implemented)`);
+            console.log(`Action: Export message ${messageId}`);
+        }
+
+        function handleDelete(messageId) {
+            // Find the index of the message to delete
+            const messageIndex = messages.findIndex(msg => msg.id === messageId);
+
+            if (messageIndex !== -1) {
+                // Remove the message from the array
+                messages.splice(messageIndex, 1);
+                console.log(`Action: Delete message ${messageId}`);
+
+                // Re-render the current page
+                renderMessages();
+                // Update pagination as total messages changed
+                renderPagination();
+                 alert(`Action: Delete message ${messageId} (Item removed from view)`);
+            } else {
+                console.warn(`Tried to delete message ${messageId}, but it was not found.`);
+            }
+        }
+
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add Event Listeners
+            prevButton.addEventListener('click', handlePrevPage);
+            nextButton.addEventListener('click', handleNextPage);
+            newMessageBtn.addEventListener('click', handleNewMessage);
+            logoutBtn.addEventListener('click', handleLogout);
+
+             // Initial Render
+            renderMessages();
+            renderPagination();
+        });
+
+    </script>
+
+</body>
+</html>
