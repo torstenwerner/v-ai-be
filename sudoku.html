@@ -10,107 +10,128 @@
             display: flex;
             justify-content: center;
             align-items: flex-start; /* Align items to the top */
-            padding-top: 20px;
             min-height: 100vh;
-            background-color: #f4f4f4;
-        }
-
-        .sudoku-container {
-            background-color: #fff;
+            background-color: #f0f0f0;
             padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center; /* Center buttons and headings */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        h1, h2 {
+        h1 {
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        .grid {
+        h2 {
+            color: #555;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .grid-container {
+            display: flex;
+            gap: 40px; /* Space between input and solution grids */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            justify-content: center;
+        }
+
+        .puzzle-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sudoku-grid {
             display: grid;
             grid-template-columns: repeat(9, 40px);
             grid-template-rows: repeat(9, 40px);
-            gap: 1px; /* Thin lines between cells */
-            background-color: #999; /* Grid line color */
-            border: 2px solid #333; /* Outer border */
-            margin: 15px auto; /* Center grid horizontally */
-            width: fit-content; /* Adjust width to content */
+            border: 3px solid black;
+            width: 360px; /* 9 * 40px */
+            height: 360px; /* 9 * 40px */
+            margin-bottom: 15px;
         }
 
-        .grid input, .grid div {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            font-size: 1.4em;
-            font-weight: bold;
-            border: none; /* Remove default input border */
-            background-color: #fff; /* Cell background */
-            box-sizing: border-box; /* Include padding/border in size */
-            display: flex; /* For vertical centering of div content */
+        .cell {
+            display: flex;
             justify-content: center;
             align-items: center;
-            color: #333; /* Default number color */
-        }
-        
-        .grid input.initial {
-             color: #00008B; /* Dark blue for initial puzzle numbers */
-             font-weight: bold;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            box-sizing: border-box; /* Include border in size */
         }
 
-        .grid div.solved {
-             color: #006400; /* Dark green for solved numbers */
-             font-weight: normal;
+        .input-cell {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 1em; /* Inherit from parent .cell */
+            font-weight: bold; /* Inherit from parent .cell */
+            border: none; /* Remove input default border */
+            outline: none;
+            padding: 0;
+            background-color: #fff;
+            color: #333; /* Color for user input */
         }
 
-        /* Style input number controls (optional, for cleaner look) */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-        input[type=number] {
-          -moz-appearance: textfield; /* Firefox */
+        .input-cell:focus {
+            background-color: #e0f7ff;
         }
 
-        /* Thicker lines for 3x3 subgrids */
-        .grid > *:nth-child(3n) {
-            border-right: 2px solid #333;
-        }
-        .grid > *:nth-child(9n) {
-            border-right: none; /* Prevent double border on the right edge */
-        }
-         /* Select rows using calculation: cells 19-27, 46-54 */
-        .grid > *:nth-child(n+19):nth-child(-n+27),
-        .grid > *:nth-child(n+46):nth-child(-n+54) {
-             border-bottom: 2px solid #333;
-        }
-         /* Select all cells in rows 3 and 6 explicitly */
-        .grid > *:nth-child(19), .grid > *:nth-child(20), .grid > *:nth-child(21),
-        .grid > *:nth-child(22), .grid > *:nth-child(23), .grid > *:nth-child(24),
-        .grid > *:nth-child(25), .grid > *:nth-child(26), .grid > *:nth-child(27),
-        .grid > *:nth-child(46), .grid > *:nth-child(47), .grid > *:nth-child(48),
-        .grid > *:nth-child(49), .grid > *:nth-child(50), .grid > *:nth-child(51),
-        .grid > *:nth-child(52), .grid > *:nth-child(53), .grid > *:nth-child(54) {
-           border-bottom: 2px solid #333;
+        .input-cell.initial-value {
+             color: #000; /* Slightly different color for initial clues */
+             background-color: #f8f8f8; /* Slightly different background */
         }
 
 
-        /* Ensure bottom border of the last row is handled by the container's border */
-        .grid > *:nth-child(n+73) {
-            border-bottom: none;
+        .solution-cell {
+             width: 100%;
+             height: 100%;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             color: #0056b3; /* Color for solved numbers */
         }
+
+        /* Thick borders for 3x3 subgrids */
+        .cell:nth-child(3n) {
+            border-right: 2px solid black;
+        }
+        .cell:nth-child(9n) {
+            border-right: none; /* Override for the last column */
+        }
+         /* Select rows 3 and 6 for thicker bottom border */
+        .sudoku-grid .cell:nth-child(n+19):nth-child(-n+27),
+        .sudoku-grid .cell:nth-child(n+46):nth-child(-n+54) {
+             border-bottom: 2px solid black;
+        }
+         /* Select rows 4 and 7 start for thicker top border (alternative way)*/
+        /* This approach relies on the grid structure */
+        /* We target cells 28-36 and 55-63 */
+        .sudoku-grid .cell:nth-child(n+28):nth-child(-n+36),
+        .sudoku-grid .cell:nth-child(n+55):nth-child(-n+63) {
+             border-top: 2px solid black;
+        }
+
 
         .buttons {
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
         }
 
         button {
             padding: 10px 20px;
             font-size: 1em;
-            margin: 0 10px;
             cursor: pointer;
             border: none;
             border-radius: 5px;
@@ -123,51 +144,59 @@
             background-color: #0056b3;
         }
 
-        button#reset-button {
-            background-color: #dc3545;
+        button:disabled {
+             background-color: #cccccc;
+             cursor: not-allowed;
         }
 
-        button#reset-button:hover {
-            background-color: #c82333;
+        #reset-button {
+             background-color: #dc3545;
+        }
+        #reset-button:hover {
+             background-color: #c82333;
         }
 
         #message {
             margin-top: 15px;
+            color: red;
             font-weight: bold;
-            min-height: 20px; /* Reserve space for messages */
+            min-height: 1.2em; /* Reserve space */
         }
 
     </style>
 </head>
 <body>
-    <div class="sudoku-container">
+    <div class="container">
         <h1>Sudoku Solver</h1>
 
-        <h2>Input Puzzle</h2>
-        <div id="input-grid" class="grid">
+        <div class="grid-container">
+            <div class="puzzle-section">
+                <h2>Input Puzzle</h2>
+                <div id="input-grid" class="sudoku-grid"></div>
+                <div class="buttons">
+                    <button id="solve-button">Solve</button>
+                    <button id="reset-button">Reset</button>
+                </div>
             </div>
 
-        <div class="buttons">
-            <button id="solve-button">Solve</button>
-            <button id="reset-button">Reset</button>
+            <div class="puzzle-section">
+                <h2>Solution</h2>
+                <div id="solution-grid" class="sudoku-grid"></div>
+            </div>
         </div>
 
-        <div id="message">Enter a puzzle or use the sample, then click Solve.</div>
-
-        <h2>Solution</h2>
-        <div id="solution-grid" class="grid">
-             </div>
+         <div id="message"></div>
     </div>
 
     <script>
-        const N = 9; // Grid size
+        const GRID_SIZE = 9;
         const inputGrid = document.getElementById('input-grid');
         const solutionGrid = document.getElementById('solution-grid');
         const solveButton = document.getElementById('solve-button');
         const resetButton = document.getElementById('reset-button');
         const messageDiv = document.getElementById('message');
 
-        // Sample Puzzle (0 represents empty cells)
+        // Sample Puzzle (0 or . represents empty cells)
         const samplePuzzle = [
             [5, 3, 0, 0, 7, 0, 0, 0, 0],
             [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -182,175 +211,235 @@
 
         // --- Grid Creation ---
 
-        function createGrids() {
-            inputGrid.innerHTML = ''; // Clear previous grid if any
-            solutionGrid.innerHTML = ''; // Clear previous grid if any
+        function createGrid(gridElement, isInput) {
+            gridElement.innerHTML = ''; // Clear existing grid
+            for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i; // Store index
 
-            for (let r = 0; r < N; r++) {
-                for (let c = 0; c < N; c++) {
-                    // Input Grid Cell
-                    const inputCell = document.createElement('input');
-                    inputCell.type = 'number';
-                    inputCell.min = '1';
-                    inputCell.max = '9';
-                    inputCell.dataset.row = r;
-                    inputCell.dataset.col = c;
-                    inputCell.id = `input-${r}-${c}`;
-                    inputCell.addEventListener('input', handleInput);
-                    inputGrid.appendChild(inputCell);
-
-                    // Solution Grid Cell
-                    const solutionCell = document.createElement('div');
-                    solutionCell.dataset.row = r;
-                    solutionCell.dataset.col = c;
-                    solutionCell.id = `solution-${r}-${c}`;
-                    solutionGrid.appendChild(solutionCell);
-
-                     // Add classes for thick borders (simplifies CSS)
-                    if ((c + 1) % 3 === 0 && c !== N - 1) {
-                        inputCell.style.borderRight = '2px solid #333';
-                        solutionCell.style.borderRight = '2px solid #333';
-                    }
-                    if ((r + 1) % 3 === 0 && r !== N - 1) {
-                         inputCell.style.borderBottom = '2px solid #333';
-                         solutionCell.style.borderBottom = '2px solid #333';
-                    }
+                if (isInput) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.classList.add('input-cell');
+                    input.dataset.index = i; // Also store index on input for easy access
+                    input.addEventListener('keydown', handleInputKeyDown);
+                    input.addEventListener('input', handleInputValueChange);
+                    cell.appendChild(input);
+                } else {
+                    cell.classList.add('solution-cell');
                 }
+                gridElement.appendChild(cell);
             }
         }
 
-        // --- Populate and Reset ---
+        function loadPuzzle(puzzle) {
+            clearGrid(inputGrid, true); // Clear input grid first
+            clearGrid(solutionGrid, false); // Clear solution grid
+            messageDiv.textContent = ''; // Clear message
 
-        function populateInputGrid(puzzle) {
-            clearSolutionGrid(); // Clear solution when loading new puzzle
-            for (let r = 0; r < N; r++) {
-                for (let c = 0; c < N; c++) {
-                    const cell = document.getElementById(`input-${r}-${c}`);
-                    const value = puzzle[r][c];
-                    if (value >= 1 && value <= 9) {
-                        cell.value = value;
-                        cell.classList.add('initial'); // Style initial numbers
-                        cell.readOnly = true; // Make initial numbers non-editable
-                    } else {
-                        cell.value = '';
-                        cell.classList.remove('initial');
-                        cell.readOnly = false;
-                    }
-                }
-            }
-            messageDiv.textContent = 'Sample puzzle loaded. Fill empty cells or reset.';
-        }
-
-        function resetGrids() {
-             for (let r = 0; r < N; r++) {
-                for (let c = 0; c < N; c++) {
-                    const inputCell = document.getElementById(`input-${r}-${c}`);
-                    inputCell.value = '';
-                    inputCell.classList.remove('initial');
-                    inputCell.readOnly = false; // Ensure all cells are editable after reset
-                    
-                    const solutionCell = document.getElementById(`solution-${r}-${c}`);
-                    solutionCell.textContent = '';
-                    solutionCell.classList.remove('solved', 'initial');
-                }
-            }
-            messageDiv.textContent = 'Input grid cleared. Enter a new puzzle.';
-        }
-        
-        function clearSolutionGrid() {
-             for (let r = 0; r < N; r++) {
-                for (let c = 0; c < N; c++) {
-                    const solutionCell = document.getElementById(`solution-${r}-${c}`);
-                    solutionCell.textContent = '';
-                    solutionCell.classList.remove('solved', 'initial');
-                }
-            }
-        }
-
-        // Handle input changes (limit to 1 digit)
-        function handleInput(e) {
-             if (e.target.value.length > 1) {
-                 e.target.value = e.target.value.slice(0, 1);
+             const inputCells = inputGrid.querySelectorAll('.input-cell');
+             for (let r = 0; r < GRID_SIZE; r++) {
+                 for (let c = 0; c < GRID_SIZE; c++) {
+                     const index = r * GRID_SIZE + c;
+                     const value = puzzle[r][c];
+                     if (value >= 1 && value <= 9) {
+                         inputCells[index].value = value;
+                         inputCells[index].classList.add('initial-value'); // Mark initial clues
+                         inputCells[index].readOnly = true; // Make initial clues non-editable
+                     } else {
+                          inputCells[index].value = '';
+                          inputCells[index].classList.remove('initial-value');
+                          inputCells[index].readOnly = false;
+                     }
+                 }
              }
-             // Clear corresponding solution cell if input changes
-             const r = e.target.dataset.row;
-             const c = e.target.dataset.col;
-             const solutionCell = document.getElementById(`solution-${r}-${c}`);
-             if (solutionCell) {
-                 solutionCell.textContent = '';
-                 solutionCell.classList.remove('solved', 'initial');
-             }
-             messageDiv.textContent = 'Puzzle modified. Click Solve when ready.';
         }
 
-        // --- Read Grid Data ---
+        function clearGrid(gridElement, isInput) {
+             const cells = gridElement.querySelectorAll(isInput ? '.input-cell' : '.solution-cell');
+             cells.forEach(cell => {
+                 if (isInput) {
+                     cell.value = '';
+                     cell.classList.remove('initial-value');
+                     cell.readOnly = false;
+                 } else {
+                     cell.textContent = '';
+                 }
+             });
+             if (!isInput) {
+                // Also clear the outer div textContent if it was used previously
+                const outerCells = gridElement.querySelectorAll('.cell');
+                outerCells.forEach(cell => {
+                    if (!cell.querySelector('.solution-cell')) { // If structure changed, ensure clean slate
+                        cell.textContent = '';
+                    }
+                });
+             }
+        }
 
-        function getBoardFromGrid() {
+
+        // --- Input Handling ---
+
+        function handleInputKeyDown(event) {
+            const target = event.target;
+            const index = parseInt(target.dataset.index);
+            const key = event.key;
+
+            // Allow navigation keys like arrows, Tab, etc.
+             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Backspace', 'Delete'].includes(key)) {
+                 // Basic Backspace/Delete handling - just allow default behavior which clears the cell
+                 return;
+             }
+
+            // Handle digit input (1-9) and Space
+            if ((key >= '1' && key <= '9') || key === ' ') {
+                 event.preventDefault(); // Prevent default input for manual control
+
+                 let nextIndex = -1;
+
+                 if (key === ' ') {
+                     target.value = ''; // Clear current cell
+                     nextIndex = (index + 1) % (GRID_SIZE * GRID_SIZE);
+                 } else if (key >= '1' && key <= '9') {
+                     target.value = key; // Set value (input event will validate)
+                     nextIndex = (index + 1) % (GRID_SIZE * GRID_SIZE);
+                 }
+
+                 // Move focus smoothly
+                 if (nextIndex !== -1) {
+                     // Use setTimeout to allow the value to update before focus moves
+                     setTimeout(() => {
+                         const nextInput = inputGrid.querySelector(`.input-cell[data-index="${nextIndex}"]`);
+                         if (nextInput) {
+                             nextInput.focus();
+                             nextInput.select(); // Select text for easy replacement
+                         }
+                     }, 0);
+                 }
+
+            } else {
+                 // Prevent any other characters
+                 event.preventDefault();
+            }
+        }
+
+         function handleInputValueChange(event) {
+             const target = event.target;
+             // Allow only single digits 1-9 or empty string
+             if (!/^[1-9]?$/.test(target.value)) {
+                 target.value = '';
+             }
+         }
+
+
+        // --- Button Actions ---
+
+        function handleReset() {
+            // Reset to the initial sample puzzle
+            loadPuzzle(samplePuzzle);
+        }
+
+        async function handleSolve() {
+            messageDiv.textContent = 'Solving...';
+            solveButton.disabled = true;
+            resetButton.disabled = true;
+            clearGrid(solutionGrid, false); // Clear previous solution
+
+            const board = readInputGrid();
+
+            // Basic validation before solving
+            if (!isBoardInitiallyValid(board)) {
+                 messageDiv.textContent = 'Invalid puzzle input. Please check for conflicts.';
+                 solveButton.disabled = false;
+                 resetButton.disabled = false;
+                 return;
+            }
+
+
+            // Use setTimeout to allow UI update before blocking with solver
+            setTimeout(() => {
+                 const solvedBoard = JSON.parse(JSON.stringify(board)); // Create a deep copy
+
+                 if (solveSudoku(solvedBoard)) {
+                     renderSolution(solvedBoard);
+                     messageDiv.textContent = 'Solved!';
+                 } else {
+                     messageDiv.textContent = 'No solution found for this puzzle.';
+                 }
+
+                 solveButton.disabled = false;
+                 resetButton.disabled = false;
+            }, 50); // Small delay
+        }
+
+        // --- Data Conversion ---
+
+        function readInputGrid() {
             const board = [];
-            for (let r = 0; r < N; r++) {
-                board[r] = [];
-                for (let c = 0; c < N; c++) {
-                    const cell = document.getElementById(`input-${r}-${c}`);
-                    const value = parseInt(cell.value, 10);
-                    board[r][c] = (value >= 1 && value <= 9) ? value : 0;
+            const inputCells = inputGrid.querySelectorAll('.input-cell');
+            for (let r = 0; r < GRID_SIZE; r++) {
+                const row = [];
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const index = r * GRID_SIZE + c;
+                    const value = inputCells[index].value;
+                    row.push(value === '' ? 0 : parseInt(value)); // Use 0 for empty
                 }
+                board.push(row);
             }
             return board;
         }
 
-        // --- Render Solution ---
+        function renderSolution(board) {
+            const solutionCells = solutionGrid.querySelectorAll('.solution-cell');
+             if (solutionCells.length === 0) { // If grid wasn't populated with .solution-cell divs initially
+                 const cells = solutionGrid.querySelectorAll('.cell');
+                 cells.forEach((cell, index) => {
+                      const r = Math.floor(index / GRID_SIZE);
+                      const c = index % GRID_SIZE;
+                      cell.textContent = board[r][c]; // Directly set textContent on the .cell div
+                      cell.classList.add('solution-cell'); // Add class for styling
+                 });
+             } else {
+                  solutionCells.forEach((cell, index) => {
+                       const r = Math.floor(index / GRID_SIZE);
+                       const c = index % GRID_SIZE;
+                       cell.textContent = board[r][c];
+                   });
+             }
 
-        function renderSolution(solvedBoard, initialBoard) {
-            for (let r = 0; r < N; r++) {
-                for (let c = 0; c < N; c++) {
-                    const cell = document.getElementById(`solution-${r}-${c}`);
-                    const value = solvedBoard[r][c];
-                    cell.textContent = value !== 0 ? value : '';
-
-                    // Style based on whether it was part of the initial puzzle or solved
-                    if (initialBoard[r][c] !== 0) {
-                         cell.classList.add('initial');
-                         cell.classList.remove('solved');
-                    } else if (value !== 0) {
-                         cell.classList.add('solved');
-                         cell.classList.remove('initial');
-                    } else {
-                         cell.classList.remove('solved', 'initial');
-                    }
-                }
-            }
         }
 
-
-        // --- Sudoku Solver Logic (Backtracking) ---
+        // --- Sudoku Solver (Backtracking) ---
 
         function findEmpty(board) {
-            for (let r = 0; r < N; r++) {
-                for (let c = 0; c < N; c++) {
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
                     if (board[r][c] === 0) {
                         return [r, c]; // Return row, col
                     }
                 }
             }
-            return null; // No empty cells
+            return null; // No empty cells found
         }
 
-        function isValid(board, num, row, col) {
-            // Check row
-            for (let c = 0; c < N; c++) {
+        function isValid(board, row, col, num) {
+            // Check Row
+            for (let c = 0; c < GRID_SIZE; c++) {
                 if (board[row][c] === num && c !== col) {
                     return false;
                 }
             }
 
-            // Check column
-            for (let r = 0; r < N; r++) {
+            // Check Column
+            for (let r = 0; r < GRID_SIZE; r++) {
                 if (board[r][col] === num && r !== row) {
                     return false;
                 }
             }
 
-            // Check 3x3 box
+            // Check 3x3 Box
             const boxRowStart = Math.floor(row / 3) * 3;
             const boxColStart = Math.floor(col / 3) * 3;
             for (let r = boxRowStart; r < boxRowStart + 3; r++) {
@@ -361,93 +450,60 @@
                 }
             }
 
-            return true; // It's a valid move
+            return true; // Number is valid
         }
-        
-        // Function to check if the initial board state is valid
+
         function isBoardInitiallyValid(board) {
-             for (let r = 0; r < N; r++) {
-                for (let c = 0; c < N; c++) {
-                    if (board[r][c] !== 0) {
-                        // Temporarily empty the cell to check validity against others
-                        const num = board[r][c];
-                        board[r][c] = 0; 
-                        if (!isValid(board, num, r, c)) {
-                            board[r][c] = num; // Restore the number
-                            return false; // Found an initial conflict
-                        }
-                        board[r][c] = num; // Restore the number
-                    }
-                }
-            }
-            return true; // No initial conflicts found
+             for (let r = 0; r < GRID_SIZE; r++) {
+                 for (let c = 0; c < GRID_SIZE; c++) {
+                     const num = board[r][c];
+                     if (num !== 0) {
+                         // Temporarily set to 0 to check validity against others
+                         board[r][c] = 0;
+                         if (!isValid(board, r, c, num)) {
+                             board[r][c] = num; // Restore original value
+                             return false; // Found a conflict
+                         }
+                         board[r][c] = num; // Restore original value
+                     }
+                 }
+             }
+             return true; // No initial conflicts found
         }
 
-        function solve(board) {
-            const find = findEmpty(board);
-            let row, col;
 
+        function solveSudoku(board) {
+            const find = findEmpty(board);
             if (!find) {
                 return true; // Puzzle solved
             } else {
-                [row, col] = find;
-            }
+                const [row, col] = find;
 
-            for (let num = 1; num <= 9; num++) {
-                if (isValid(board, num, row, col)) {
-                    board[row][col] = num; // Try placing the number
+                for (let num = 1; num <= 9; num++) {
+                    if (isValid(board, row, col, num)) {
+                        board[row][col] = num;
 
-                    if (solve(board)) {
-                        return true; // Found a solution
+                        if (solveSudoku(board)) {
+                            return true; // Found solution down this path
+                        }
+
+                        // Backtrack
+                        board[row][col] = 0;
                     }
-
-                    board[row][col] = 0; // Backtrack: reset cell if solution not found down this path
                 }
+                return false; // No valid number for this cell, trigger backtrack
             }
-
-            return false; // Trigger backtracking
         }
 
-        // --- Event Listeners ---
-
-        solveButton.addEventListener('click', () => {
-            messageDiv.textContent = 'Solving...';
-            clearSolutionGrid(); // Clear previous solution attempt
-
-            // Use setTimeout to allow the "Solving..." message to render
-            setTimeout(() => {
-                const board = getBoardFromGrid();
-                const initialBoard = getBoardFromGrid(); // Keep a copy of the initial state
-
-                // Validate the initial board state
-                 if (!isBoardInitiallyValid(board)) {
-                    messageDiv.textContent = 'Invalid puzzle input: conflicts detected.';
-                    messageDiv.style.color = 'red';
-                    return; // Stop if initial board is invalid
-                }
-
-
-                if (solve(board)) {
-                    renderSolution(board, initialBoard);
-                    messageDiv.textContent = 'Solution Found!';
-                    messageDiv.style.color = 'green';
-                } else {
-                    messageDiv.textContent = 'No solution exists for this puzzle.';
-                    messageDiv.style.color = 'red';
-                }
-            }, 10); // Small delay like 10ms is often enough
-        });
-
-        resetButton.addEventListener('click', () => {
-             resetGrids();
-             messageDiv.style.color = 'black'; // Reset message color
-        });
-
         // --- Initialization ---
-        window.onload = () => {
-            createGrids();
-            populateInputGrid(samplePuzzle); // Load sample puzzle on start
-        };
+        document.addEventListener('DOMContentLoaded', () => {
+            createGrid(inputGrid, true);
+            createGrid(solutionGrid, false);
+            loadPuzzle(samplePuzzle); // Load the sample puzzle initially
+
+            solveButton.addEventListener('click', handleSolve);
+            resetButton.addEventListener('click', handleReset);
+        });
 
     </script>
 </body>
