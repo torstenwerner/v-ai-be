@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mock Mail Client</title>
+    <title>Web Mail Client</title>
     <style>
-        /* Basic Reset & Body */
+        /* Basic Reset & Defaults */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,8 +13,8 @@
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f6f8fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
             color: #202124;
             display: flex;
             flex-direction: column;
@@ -22,175 +22,217 @@
             overflow: hidden; /* Prevent body scroll */
         }
 
+        button {
+            cursor: pointer;
+            padding: 8px 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f1f3f4;
+        }
+
+        button:hover {
+            background-color: #e8eaed;
+            border-color: #bbb;
+        }
+
         /* Header */
         header {
             display: flex;
             align-items: center;
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-bottom: 1px solid #dadce0;
-            background-color: #f6f8fc;
-            height: 60px;
-            flex-shrink: 0;
+            background-color: #fff;
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
 
         .logo {
+            font-size: 1.5em;
             font-weight: bold;
-            font-size: 1.4em;
-            color: #5f6368;
+            color: #d93025; /* Gmail-like red */
             margin-right: 30px;
-            white-space: nowrap;
         }
 
         .search-container {
             position: relative;
+            display: flex;
+            align-items: center;
             flex-grow: 1;
+            max-width: 720px;
             margin-right: 20px;
-            max-width: 720px; /* Limit search bar width like Gmail */
         }
 
-        #searchInput {
+        #search-input {
             width: 100%;
-            padding: 10px 15px;
-            border: 1px solid transparent; /* Initially transparent */
-            border-radius: 8px;
-            background-color: #eaf1fb;
-            font-size: 1em;
-            outline: none;
-            transition: background-color 0.2s, box-shadow 0.2s;
-        }
-
-        #searchInput:focus {
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-color: transparent; /* Keep border transparent on focus */
-        }
-
-        /* Autocomplete Styles */
-        .autocomplete-items {
-            position: absolute;
+            padding: 10px 35px 10px 15px; /* Space for clear button */
             border: 1px solid #dadce0;
-            border-top: none;
-            z-index: 99;
-            top: 100%;
+            border-radius: 8px;
+            background-color: #f1f3f4;
+            font-size: 1em;
+        }
+
+        #search-input:focus {
+            background-color: #fff;
+            border-color: #a7aab0;
+            outline: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        #clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            color: #5f6368;
+            padding: 5px;
+            display: none; /* Hidden initially */
+        }
+
+         #clear-search-btn:hover {
+            color: #202124;
+         }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 105%;
             left: 0;
             right: 0;
             background-color: #fff;
-            border-radius: 0 0 8px 8px; /* Match input radius */
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            border: 1px solid #dadce0;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(32,33,36,0.28);
+            z-index: 1000;
             max-height: 300px;
             overflow-y: auto;
-            display: none; /* Initially hidden */
+            display: none; /* Hidden initially */
         }
 
-        .autocomplete-items div {
-            padding: 10px 15px;
+        .autocomplete-group-label {
+            padding: 8px 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #5f6368;
+            background-color: #f1f3f4;
+            border-top: 1px solid #e8eaed;
+        }
+         .autocomplete-group-label:first-child {
+            border-top: none;
+         }
+
+        .autocomplete-item {
+            padding: 8px 15px;
             cursor: pointer;
-            border-bottom: 1px solid #eee;
             font-size: 0.9em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .autocomplete-items div:last-child {
-            border-bottom: none;
         }
 
-        .autocomplete-items div:hover {
+        .autocomplete-item:hover {
             background-color: #f1f3f4;
         }
-        .autocomplete-items div strong {
-           color: #1a73e8; /* Highlight matching part if needed */
-        }
-
 
         .header-actions {
             display: flex;
             align-items: center;
-            white-space: nowrap;
+            margin-left: auto; /* Pushes actions to the right */
         }
 
-        .header-actions button,
-        .header-actions span {
-            margin-left: 15px;
+        #compose-btn {
+            background-color: #c2e7ff; /* Light blue */
+            border: none;
+            padding: 10px 20px;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        #compose-btn:hover {
+             background-color: #a5d8ff;
+        }
+
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            margin-right: 10px; /* Space between name and avatar placeholder */
+        }
+
+        /* Simple avatar placeholder */
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #7e57c2; /* Example color */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
             font-size: 0.9em;
         }
 
-        #newMessageBtn {
-            padding: 10px 20px;
-            background-color: #c2e7ff; /* Light blue like compose */
+
+        #logout-btn {
+            background: none;
             border: none;
-            border-radius: 18px;
-            cursor: pointer;
-            font-weight: 500;
-            color: #001d35; /* Darker text for contrast */
-            transition: box-shadow .08s linear,min-width .15s cubic-bezier(0.4,0,0.2,1);
+            color: #5f6368;
+            padding: 10px;
         }
-        #newMessageBtn:hover {
-             box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
-             background-color: #c2e7ff;
-        }
-
-
-        #userName {
-            font-weight: 500;
-             color: #444746;
-        }
-
-        #logoutBtn {
-            padding: 8px 12px;
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #logoutBtn:hover {
-             background-color: #f1b0b7;
-        }
-
+         #logout-btn:hover {
+             background-color: #f1f3f4;
+             color: #202124;
+         }
 
         /* Main Content Area */
         main {
-            flex-grow: 1;
-            overflow-y: auto; /* Allow main content to scroll */
-            padding: 0;
+            flex-grow: 1; /* Takes remaining vertical space */
+            overflow-y: auto; /* Allows message list to scroll */
             background-color: #fff;
-            display: flex;
-            flex-direction: column;
+            padding: 10px 0; /* Padding top/bottom */
         }
 
-        #messageList {
-            flex-grow: 1;
-            min-height: 0; /* Needed for flex-grow in overflow context */
+        #message-list {
+            list-style: none;
         }
 
-        /* Message Row Styling */
         .message-row {
             display: flex;
             align-items: center;
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-bottom: 1px solid #e8eaed;
             cursor: pointer;
-            font-size: 0.9em;
-            position: relative; /* For hover shadow */
-             transition: background-color 0.1s ease-out;
+            position: relative; /* For absolute positioning of actions */
+            min-height: 45px; /* Ensure consistent row height */
         }
 
         .message-row:hover {
             background-color: #f5f5f5;
-            box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+            box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
             z-index: 2;
         }
 
-        .message-sender {
-            min-width: 150px;
-            max-width: 200px;
-            padding-right: 15px;
+        .message-row.unread .message-sender,
+        .message-row.unread .message-subject {
+            font-weight: bold;
+            color: #202124;
+        }
+
+        .message-row:not(.unread) .message-sender,
+        .message-row:not(.unread) .message-subject {
             font-weight: normal;
+            color: #5f6368;
+        }
+
+        .message-sender {
+            min-width: 180px; /* Adjust as needed */
+            padding-right: 20px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-             color: #5f6368;
         }
 
         .message-subject {
@@ -198,175 +240,197 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-             color: #5f6368;
-             font-weight: normal;
-             padding-right: 10px;
+            padding-right: 10px; /* Space before actions */
         }
-
-        .message-row.unread .message-sender,
-        .message-row.unread .message-subject {
-            font-weight: bold;
-            color: #202124; /* Darker color for unread */
-        }
-
 
         .message-actions {
-            margin-left: auto;
-            display: flex;
-            opacity: 0; /* Initially hidden */
-            transition: opacity 0.1s ease-out;
-            flex-shrink: 0; /* Prevent actions from shrinking */
+            display: none; /* Hidden by default */
+            align-items: center;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #f5f5f5; /* Match hover background */
+            padding: 0 5px;
+            border-radius: 4px;
         }
 
-         .message-row:hover .message-actions {
-             opacity: 1; /* Show actions on hover */
+        /* Show actions on hover for desktop */
+        @media (hover: hover) {
+            .message-row:hover .message-actions {
+                display: flex;
+            }
+            .message-row:hover .message-subject {
+                 /* Prevent subject overlap when actions appear */
+                 padding-right: 150px; /* Adjust based on action button widths */
+            }
+        }
+        /* Always show actions on focus/touch devices (simplified) */
+         .message-row:focus .message-actions,
+         .message-row:active .message-actions {
+             display: flex;
          }
+
 
         .message-actions button {
             background: none;
             border: none;
-            cursor: pointer;
-            padding: 5px;
-            margin-left: 8px;
-            font-size: 1.1em; /* Slightly larger icons/text */
-             color: #5f6368;
-             display: flex;
-             align-items: center;
-             justify-content: center;
-             width: 28px;
-             height: 28px;
-             border-radius: 50%;
+            padding: 8px;
+            margin-left: 5px;
+            font-size: 0.9em;
+            color: #5f6368;
         }
+
         .message-actions button:hover {
-             background-color: #e8eaed;
-             color: #202124;
+            background-color: #e8eaed;
+            color: #202124;
         }
-        /* Simple text icons for demo */
-        .action-reply::before { content: '↩️'; }
-        .action-forward::before { content: '↪️'; }
-        .action-export::before { content: '💾'; }
-        .action-delete::before { content: '🗑️'; }
 
 
         /* Pagination */
-        #paginationControls {
-            padding: 15px;
-            text-align: right;
-            border-top: 1px solid #e8eaed;
+        #pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 15px 20px;
+            border-top: 1px solid #dadce0;
             background-color: #fff;
-             flex-shrink: 0; /* Prevent pagination from shrinking */
-             font-size: 0.9em;
-             color: #5f6368;
+            flex-shrink: 0; /* Prevent pagination from shrinking */
         }
 
-        #paginationControls button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px 10px;
-            margin-left: 10px;
-             color: #5f6368;
-             font-size: 1.2em;
-             border-radius: 4px;
+        #page-info {
+            margin: 0 15px;
+            font-size: 0.9em;
+            color: #5f6368;
         }
-        #paginationControls button:hover:not(:disabled) {
+
+        #prev-page-btn, #next-page-btn {
+            padding: 5px 10px;
+            font-size: 1.2em;
+        }
+
+        #prev-page-btn:disabled, #next-page-btn:disabled {
+            color: #ccc;
+            cursor: default;
             background-color: #f1f3f4;
         }
 
-        #paginationControls button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
+        /* Utility */
+        .hidden {
+            display: none !important;
         }
-         #pageInfo {
-             margin: 0 10px;
-         }
 
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="logo">M-Mail</div>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search mail">
-            <div id="autocompleteList" class="autocomplete-items">
-                </div>
-        </div>
-        <div class="header-actions">
-            <button id="newMessageBtn">+ Compose</button>
-            <span id="userName">Tina Tisch</span>
-            <button id="logoutBtn">Logout</button>
-        </div>
-    </header>
-
-    <main>
-        <div id="messageList">
+    <div id="app">
+        <header>
+            <div class="logo">Mail</div>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search mail">
+                 <button id="clear-search-btn" title="Clear search">&times;</button>
+                <div id="autocomplete-dropdown" class="autocomplete-dropdown">
+                    </div>
             </div>
-         <div id="paginationControls">
-            <span id="pageInfo"></span>
-            <button id="prevPageBtn" title="Previous page" disabled>&lt;</button>
-            <button id="nextPageBtn" title="Next page">&gt;</button>
-        </div>
-    </main>
+            <div class="header-actions">
+                 <button id="compose-btn">Compose</button>
+                <div class="user-info">
+                    <span class="user-name" id="user-name-display">Tina Tisch</span>
+                     <div class="user-avatar" id="user-avatar-display">TT</div>
+                </div>
+                <button id="logout-btn">Logout</button>
+            </div>
+        </header>
 
+        <main>
+            <ul id="message-list">
+                </ul>
+        </main>
+
+        <footer>
+            <div id="pagination">
+                <span id="page-info"></span>
+                <button id="prev-page-btn" title="Previous page">&lt;</button>
+                <button id="next-page-btn" title="Next page">&gt;</button>
+            </div>
+        </footer>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const messageList = document.getElementById('messageList');
-            const searchInput = document.getElementById('searchInput');
-            const autocompleteList = document.getElementById('autocompleteList');
-            const userNameDisplay = document.getElementById('userName'); // Use if needed
-            const newMessageBtn = document.getElementById('newMessageBtn');
-            const logoutBtn = document.getElementById('logoutBtn');
-            const prevPageBtn = document.getElementById('prevPageBtn');
-            const nextPageBtn = document.getElementById('nextPageBtn');
-            const pageInfo = document.getElementById('pageInfo');
-
-            const MESSAGES_PER_PAGE = 50;
+            // --- State ---
+            let allMessages = [];
             let currentPage = 1;
-            let mockMessages = [];
-            let totalMessages = 0;
+            const itemsPerPage = 50;
+            let currentUserName = "Tina Tisch";
+            let isAutocompleteVisible = false;
+            let autocompleteTimeout = null; // For handling blur/click race condition
 
-            // --- Mock Data Generation ---
+            // --- Mock Data ---
+            const senders = ["Alice Adams", "Bob Barker", "Charlie Chaplin", "Diana Prince", "Ethan Hunt", "Fiona Gallagher", "George Constanza", "Hannah Horvath", "Ian Malcolm", "Jane Doe"];
+            const subjects = ["Meeting Reminder", "Project Update", "Quick Question", "Lunch Invite", "Document Review", "Invoice Attached", "Weekend Plans", "Action Required", "FYI", "Re: Your Inquiry"];
+
             function generateMockMessages(count) {
-                const senders = ["Alice Appleton", "Bob Baker", "Charlie Chaplin", "Diana Prince", "Ethan Hunt", "Fiona Gallagher", "George Gently", "Hannah Horvath", "Ian Malcolm", "Jane Jetson"];
-                const subjects = ["Meeting Reminder", "Project Update", "Quick Question", "Weekend Plans", "Invoice Attached", "Fwd: Interesting Article", "Your Order Confirmation", "Re: Feedback Request", "Happy Birthday!", "Travel Itinerary"];
                 const messages = [];
                 for (let i = 1; i <= count; i++) {
                     messages.push({
                         id: `msg-${i}`,
                         sender: senders[Math.floor(Math.random() * senders.length)],
-                        subject: subjects[Math.floor(Math.random() * subjects.length)] + (Math.random() > 0.8 ? ` #${i}` : ''), // Add some variation
-                        read: false, // Initially all unread
-                        timestamp: Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 7) // Randomly within last week
+                        subject: subjects[Math.floor(Math.random() * subjects.length)] + (Math.random() > 0.8 ? ` #${i}` : ''), // Add some uniqueness
+                        body: `This is the body of message ${i}.`,
+                        read: false // Initially all unread
                     });
                 }
-                // Sort by timestamp descending (newest first) - common in email
-                messages.sort((a, b) => b.timestamp - a.timestamp);
                 return messages;
             }
 
-            // --- Rendering Logic ---
-            function renderMessages() {
-                messageList.innerHTML = ''; // Clear previous messages
-                const startIndex = (currentPage - 1) * MESSAGES_PER_PAGE;
-                const endIndex = startIndex + MESSAGES_PER_PAGE;
-                const messagesToDisplay = mockMessages.slice(startIndex, endIndex);
+             const autocompleteData = [
+                { group: 'messages', items: ['all', 'unread'] },
+                { group: 'mailbox', items: ['Tina Tisch', 'Bernd Bank', 'Violeta Jarmusch'] },
+                { group: 'folder', items: ['inbox', 'outbox', 'sent', 'trash'] },
+                { group: 'label', items: ['urgent', 'done'] }
+            ];
 
-                if (messagesToDisplay.length === 0 && currentPage > 1) {
-                     // If deletion leads to empty page, go back
-                    currentPage--;
-                    renderMessages();
-                    return;
+
+            // --- DOM Elements ---
+            const messageListEl = document.getElementById('message-list');
+            const paginationInfoEl = document.getElementById('page-info');
+            const prevPageBtn = document.getElementById('prev-page-btn');
+            const nextPageBtn = document.getElementById('next-page-btn');
+            const searchInputEl = document.getElementById('search-input');
+            const clearSearchBtn = document.getElementById('clear-search-btn');
+            const autocompleteDropdownEl = document.getElementById('autocomplete-dropdown');
+            const userNameDisplayEl = document.getElementById('user-name-display');
+            const userAvatarDisplayEl = document.getElementById('user-avatar-display');
+            const composeBtn = document.getElementById('compose-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // --- Functions ---
+
+            function renderMessages() {
+                messageListEl.innerHTML = ''; // Clear existing messages
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const messagesToDisplay = allMessages.slice(startIndex, endIndex);
+
+                if (messagesToDisplay.length === 0 && allMessages.length > 0) {
+                     // Handle case where current page becomes empty after deletion/filtering (if implemented)
+                     currentPage = Math.max(1, currentPage - 1);
+                     renderMessages(); // Re-render with adjusted page
+                     return;
                 }
 
+
                 messagesToDisplay.forEach(message => {
-                    const row = document.createElement('div');
-                    row.classList.add('message-row');
-                    row.dataset.messageId = message.id;
+                    const li = document.createElement('li');
+                    li.classList.add('message-row');
+                    li.dataset.id = message.id;
                     if (!message.read) {
-                        row.classList.add('unread');
+                        li.classList.add('unread');
                     }
+                     // Make row focusable for accessibility and action display
+                     li.setAttribute('tabindex', '0');
+
 
                     const senderSpan = document.createElement('span');
                     senderSpan.classList.add('message-sender');
@@ -376,206 +440,231 @@
                     subjectSpan.classList.add('message-subject');
                     subjectSpan.textContent = message.subject;
 
+                    // --- Actions ---
                     const actionsDiv = document.createElement('div');
                     actionsDiv.classList.add('message-actions');
 
-                    // Action Buttons (non-functional for now)
-                    const replyBtn = createActionButton('Reply', 'action-reply', message.id);
-                    const forwardBtn = createActionButton('Forward', 'action-forward', message.id);
-                    const exportBtn = createActionButton('Export', 'action-export', message.id);
-                    const deleteBtn = createActionButton('Delete', 'action-delete', message.id);
+                    const replyBtn = document.createElement('button');
+                    replyBtn.textContent = 'Reply';
+                    replyBtn.title = 'Reply to message';
+                    replyBtn.onclick = (e) => { e.stopPropagation(); console.log('Reply clicked:', message.id); alert('Reply action (not implemented)'); };
 
-                    actionsDiv.append(replyBtn, forwardBtn, exportBtn, deleteBtn);
+                    const forwardBtn = document.createElement('button');
+                    forwardBtn.textContent = 'Forward';
+                     forwardBtn.title = 'Forward message';
+                    forwardBtn.onclick = (e) => { e.stopPropagation(); console.log('Forward clicked:', message.id); alert('Forward action (not implemented)'); };
 
-                    row.append(senderSpan, subjectSpan, actionsDiv);
-                    messageList.appendChild(row);
+                    const exportBtn = document.createElement('button');
+                    exportBtn.textContent = 'Export';
+                    exportBtn.title = 'Export message';
+                    exportBtn.onclick = (e) => { e.stopPropagation(); console.log('Export clicked:', message.id); alert('Export action (not implemented)'); };
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                     deleteBtn.title = 'Delete message';
+                    deleteBtn.onclick = (e) => { e.stopPropagation(); console.log('Delete clicked:', message.id); alert('Delete action (not implemented)'); };
+
+                    actionsDiv.appendChild(replyBtn);
+                    actionsDiv.appendChild(forwardBtn);
+                    // actionsDiv.appendChild(exportBtn); // Optional action
+                    actionsDiv.appendChild(deleteBtn);
+
+                    li.appendChild(senderSpan);
+                    li.appendChild(subjectSpan);
+                    li.appendChild(actionsDiv); // Add actions container
+
+                    // Click event for marking as read
+                    li.addEventListener('click', () => {
+                        if (!message.read) {
+                            message.read = true;
+                            li.classList.remove('unread');
+                             // No need to re-render the whole list, just update the class
+                        }
+                         console.log('Message clicked:', message.id);
+                         // Potentially open message detail view here in a real app
+                    });
+
+                     // Prevent focus ring on click but allow keyboard focus
+                     li.addEventListener('mousedown', (e) => e.preventDefault());
+
+
+                    messageListEl.appendChild(li);
                 });
 
-                 // Scroll to top of message list when page changes
-                 messageList.scrollTop = 0;
-
-                updatePaginationControls();
+                renderPagination();
             }
 
-             function createActionButton(title, className, messageId) {
-                 const button = document.createElement('button');
-                 button.title = title;
-                 button.classList.add(className);
-                 button.dataset.messageId = messageId;
-                 // Add simple alert for now to show interaction
-                  button.addEventListener('click', (event) => {
-                     event.stopPropagation(); // Prevent row click (mark as read)
-                     handleActionClick(title.toLowerCase(), messageId);
-                 });
-                 return button;
-             }
+            function renderPagination() {
+                const totalItems = allMessages.length;
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+                // Handle no messages case
+                if (totalItems === 0) {
+                    paginationInfoEl.textContent = "No messages";
+                    prevPageBtn.disabled = true;
+                    nextPageBtn.disabled = true;
+                    prevPageBtn.classList.add('hidden');
+                    nextPageBtn.classList.add('hidden');
+                    return;
+                } else {
+                    prevPageBtn.classList.remove('hidden');
+                    nextPageBtn.classList.remove('hidden');
+                }
 
 
-            // --- Pagination Logic ---
-            function updatePaginationControls() {
-                const totalPages = Math.ceil(totalMessages / MESSAGES_PER_PAGE);
-                 const startItem = Math.min((currentPage - 1) * MESSAGES_PER_PAGE + 1, totalMessages);
-                 const endItem = Math.min(currentPage * MESSAGES_PER_PAGE, totalMessages);
+                const startItem = (currentPage - 1) * itemsPerPage + 1;
+                const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
-                if (totalMessages === 0) {
-                     pageInfo.textContent = '0-0 of 0';
-                 } else {
-                    pageInfo.textContent = `${startItem}-${endItem} of ${totalMessages}`;
-                 }
+                paginationInfoEl.textContent = `${startItem}-${endItem} of ${totalItems}`;
 
                 prevPageBtn.disabled = currentPage === 1;
-                nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+                nextPageBtn.disabled = currentPage === totalPages;
             }
 
-            function goToPrevPage() {
-                if (currentPage > 1) {
-                    currentPage--;
-                    renderMessages();
-                }
+            function updateUserDetails() {
+                 userNameDisplayEl.textContent = currentUserName;
+                 // Generate initials for avatar
+                 const initials = currentUserName.split(' ').map(name => name[0]).join('').toUpperCase();
+                 userAvatarDisplayEl.textContent = initials.substring(0, 2); // Max 2 initials
             }
 
-            function goToNextPage() {
-                const totalPages = Math.ceil(totalMessages / MESSAGES_PER_PAGE);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    renderMessages();
-                }
-            }
 
-            // --- Message Interaction Logic ---
-            function handleMessageClick(event) {
-                 const row = event.target.closest('.message-row');
-                 if (!row) return; // Clicked outside a row
+             function renderAutocomplete(searchTerm = '') {
+                autocompleteDropdownEl.innerHTML = '';
+                const termLower = searchTerm.trim().toLowerCase();
+                let filteredData = [];
 
-                 const messageId = row.dataset.messageId;
-                 const message = mockMessages.find(m => m.id === messageId);
-
-                 if (message && !message.read) {
-                     message.read = true;
-                     row.classList.remove('unread');
-                     // In a real app, you'd notify the backend here.
-                     console.log(`Marked message ${messageId} as read.`);
-                 }
-                 // Add logic here to display message details if needed in future
-                 console.log(`Clicked message ${messageId}`);
-            }
-
-             function handleActionClick(action, messageId) {
-                 console.log(`Action "${action}" clicked for message ${messageId}`);
-                 // Placeholder for future actions
-                 alert(`Action: ${action} on message ${messageId}\n(This action is not yet implemented)`);
-
-                 // Example: Implement Delete
-                 if (action === 'delete') {
-                     if (confirm(`Are you sure you want to delete message ${messageId}?`)) {
-                        mockMessages = mockMessages.filter(m => m.id !== messageId);
-                        totalMessages = mockMessages.length;
-                        // Re-render the current page
-                        renderMessages();
+                 // Filter existing groups
+                 autocompleteData.forEach(group => {
+                     const matchingItems = group.items.filter(item =>
+                         item.toLowerCase().includes(termLower)
+                     );
+                     if (matchingItems.length > 0) {
+                         filteredData.push({ group: group.group, items: matchingItems });
                      }
+                 });
+
+                 // Add dynamic 'filter' group if there's a search term
+                 if (termLower) {
+                     filteredData.push({
+                         group: 'filter',
+                         items: [`sender: ${searchTerm}`, `subject: ${searchTerm}`]
+                     });
                  }
-            }
 
-            // --- Search Autocomplete Logic ---
-            const baseAutocompleteItems = [
-                { key: "messages", value: "all" },
-                { key: "messages", value: "unread" },
-                { key: "mailbox", value: "Tina Tisch" },
-                { key: "mailbox", value: "Bernd Bank" },
-                { key: "mailbox", value: "Violeta Jarmusch" },
-                { key: "folder", value: "inbox" },
-                { key: "folder", value: "outbox" },
-                { key: "folder", value: "sent" },
-                { key: "folder", value: "trash" },
-                { key: "label", value: "urgent" },
-                { key: "label", value: "done" },
-            ];
-
-            function showAutocomplete() {
-                const query = searchInput.value.toLowerCase().trim();
-                autocompleteList.innerHTML = ''; // Clear previous items
-
-                let itemsToShow = [];
-
-                // Filter base items
-                if (query) {
-                    itemsToShow = baseAutocompleteItems.filter(item =>
-                        item.value.toLowerCase().includes(query)
-                    );
-                } else {
-                     // Show all base items if query is empty (on focus)
-                     itemsToShow = [...baseAutocompleteItems];
+                 if (filteredData.length === 0 && !termLower) {
+                    // If no term and no matches (shouldn't happen with initial data)
+                    // Or if you want to show *all* items when input is focused but empty:
+                    filteredData = autocompleteData; // Show all initial items
+                 } else if (filteredData.length === 0 && termLower) {
+                     const noResultsEl = document.createElement('div');
+                     noResultsEl.textContent = 'No suggestions found';
+                     noResultsEl.style.padding = '8px 15px';
+                     noResultsEl.style.color = '#5f6368';
+                     autocompleteDropdownEl.appendChild(noResultsEl);
+                     autocompleteDropdownEl.style.display = 'block';
+                     isAutocompleteVisible = true;
+                     return; // Stop here if no results
                  }
 
 
-                // Add dynamic items if there's a query
-                if (query) {
-                    itemsToShow.unshift( // Add to the beginning
-                        { key: "subject", value: query },
-                        { key: "sender", value: query }
-                    );
-                }
+                 filteredData.forEach(groupData => {
+                    const groupLabel = document.createElement('div');
+                    groupLabel.classList.add('autocomplete-group-label');
+                    groupLabel.textContent = groupData.group;
+                    autocompleteDropdownEl.appendChild(groupLabel);
 
-                if (itemsToShow.length > 0) {
-                    itemsToShow.forEach(item => {
-                        const div = document.createElement('div');
-                        // Basic highlighting (optional)
-                        const valueDisplay = item.value.replace(
-                            new RegExp(`(${query})`, 'gi'),
-                            '<strong>$1</strong>'
-                         );
-                        div.innerHTML = `${item.key}: ${query ? valueDisplay : item.value}`;
-                        div.dataset.value = `${item.key}:${item.value}`; // Store full value if needed
-                        div.addEventListener('click', () => {
-                            searchInput.value = `${item.key}:${item.value}`;
-                            autocompleteList.style.display = 'none';
-                            console.log(`Selected search: ${searchInput.value}`);
-                            // Here you would trigger the actual search filtering logic
-                             alert(`Search initiated for: ${searchInput.value}\n(Search filtering not implemented)`);
+                    groupData.items.forEach(itemText => {
+                        const itemEl = document.createElement('div');
+                        itemEl.classList.add('autocomplete-item');
+                        itemEl.textContent = itemText;
+                        // Use mousedown instead of click to beat the blur event
+                        itemEl.addEventListener('mousedown', (e) => {
+                             e.preventDefault(); // Prevent input blur
+                            searchInputEl.value = itemText;
+                            clearSearchBtn.style.display = searchInputEl.value ? 'block' : 'none';
+                            hideAutocomplete();
+                            console.log("Selected:", itemText);
+                            // In a real app, trigger search/filter based on selection here
                         });
-                        autocompleteList.appendChild(div);
+                        autocompleteDropdownEl.appendChild(itemEl);
                     });
-                    autocompleteList.style.display = 'block';
-                } else {
-                    autocompleteList.style.display = 'none';
-                }
-            }
+                 });
+
+                  if (filteredData.length > 0) {
+                     autocompleteDropdownEl.style.display = 'block';
+                     isAutocompleteVisible = true;
+                 } else {
+                     hideAutocomplete(); // Hide if filtering resulted in nothing
+                 }
+             }
+
+             function showAutocomplete() {
+                 // Render based on current input value
+                 renderAutocomplete(searchInputEl.value);
+             }
 
              function hideAutocomplete() {
-                 // Delay hiding to allow click event on items to register
-                 setTimeout(() => {
-                     autocompleteList.style.display = 'none';
-                 }, 150);
+                if(isAutocompleteVisible) {
+                     autocompleteDropdownEl.style.display = 'none';
+                     isAutocompleteVisible = false;
+                 }
              }
 
 
             // --- Event Listeners ---
-            prevPageBtn.addEventListener('click', goToPrevPage);
-            nextPageBtn.addEventListener('click', goToNextPage);
-            messageList.addEventListener('click', handleMessageClick);
+            prevPageBtn.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderMessages();
+                }
+            });
 
-            searchInput.addEventListener('focus', showAutocomplete);
-            searchInput.addEventListener('input', showAutocomplete);
-            searchInput.addEventListener('blur', hideAutocomplete);
+            nextPageBtn.addEventListener('click', () => {
+                const totalPages = Math.ceil(allMessages.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderMessages();
+                }
+            });
 
-             // Close autocomplete if clicked outside
-            document.addEventListener('click', (event) => {
-                if (!searchInput.contains(event.target) && !autocompleteList.contains(event.target)) {
-                     autocompleteList.style.display = 'none';
-                 }
+             searchInputEl.addEventListener('focus', () => {
+                 clearTimeout(autocompleteTimeout); // Clear any pending hide timer
+                 showAutocomplete();
              });
 
-            // Dummy listeners for header buttons
-             newMessageBtn.addEventListener('click', () => alert('Compose new message (not implemented)'));
-             logoutBtn.addEventListener('click', () => alert('Logout (not implemented)'));
+             searchInputEl.addEventListener('blur', () => {
+                 // Delay hiding to allow click on dropdown items
+                 autocompleteTimeout = setTimeout(hideAutocomplete, 150);
+             });
 
+              searchInputEl.addEventListener('input', () => {
+                  const searchTerm = searchInputEl.value;
+                   clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+                   renderAutocomplete(searchTerm); // Re-render with filter
+              });
+
+              clearSearchBtn.addEventListener('click', () => {
+                  searchInputEl.value = '';
+                  clearSearchBtn.style.display = 'none';
+                  renderAutocomplete(); // Show initial suggestions again
+                  searchInputEl.focus(); // Keep focus in search box
+              });
+
+              // Placeholder Actions
+              composeBtn.addEventListener('click', () => alert('Compose new message (not implemented)'));
+              logoutBtn.addEventListener('click', () => alert('Logout (not implemented)'));
 
             // --- Initialization ---
-            mockMessages = generateMockMessages(75); // Generate example messages (more than one page)
-            totalMessages = mockMessages.length;
+            allMessages = generateMockMessages(75); // Generate more than 50 for pagination
+            updateUserDetails();
             renderMessages(); // Initial render
+            renderPagination(); // Initial pagination state
+
+            // Set initial state for clear button if search is pre-filled (it's not here)
+            clearSearchBtn.style.display = searchInputEl.value ? 'block' : 'none';
+
         });
     </script>
-
 </body>
 </html>

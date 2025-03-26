@@ -45,20 +45,16 @@ When clicking a message its unread status should change into read.
 Each message should have actions for answering, forwarding, exporting, and deleting it.
 These actions should not do anything at the moment.
 The search input field should provide a pull down menu with autocompletion items.
-The menu item have a format "key: value".
+The menu items are grouped where each menu item group has a group label.
 As soon as the user focuses the search field it should show these menu items.
-- messages: all
-- messages: unread
-- mailbox: Tina Tisch
-- mailbox: Bernd Bank
-- mailbox: Violeta Jarmusch
-- folder: inbox
-- folder: outbox
-- folder: sent
-- folder: trash
-- label: urgent
-- label: done
-After the user has entered a search query e.g. 'foo' the menu items should be filtered to show only the items with a value matching 'foo'.
-But some additional menu items should be added:
-- sender: foo
-- subject: foo
+- group 'messages' with menu items 'all', 'unread'
+- group 'mailbox' with menu items 'Tina Tisch', 'Bernd Bank', 'Violeta Jarmusch'
+- group 'folder' with menu items 'inbox', 'outbox', 'sent', 'trash'
+- group 'label' with menu items 'urgent', 'done'
+After the user has entered a search query e.g. 'Ban' the menu items should be filtered to show only the items matching 'Ban'.
+In this example the group 'mailbox' with menu item 'Bernd Bank' should still be shown because it matches 'Ban'.
+Other menu items not matching 'Ban' should be removed.
+One more menu group should be added to the filtered drop down menu:
+- group 'filter' with menu items 'sender: Ban', 'subject: Ban' where 'Ban' should be the search term.
+
+The search field should have an icon button to reset the search term if it is not empty.
