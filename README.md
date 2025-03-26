@@ -2,8 +2,9 @@
 
 ## Sudoku solver
 
-The solver is available at: https://torstenwerner.github.io/v-ai-be/sudoku.html
+The solver is available at: [https://torstenwerner.github.io/v-ai-be/sudoku.html](https://torstenwerner.github.io/v-ai-be/sudoku.html).
 For faster input the space key will delete the value of the current cell.
+Just try an extreme example from [https://sudoku.com/extreme/](https://sudoku.com/extreme/).
 
 It has been created with Google Gemini 2.5 pro and the following prompt.
 
