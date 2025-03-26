@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Webmail</title>
+    <title>Mock Mail Client</title>
     <style>
-        /* Basic Reset & Body Styling */
+        /* Basic Reset & Body */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,464 +13,568 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f4f7fa;
+            font-family: 'Arial', sans-serif;
+            background-color: #f6f8fc;
+            color: #202124;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll */
         }
 
-        button {
-            cursor: pointer;
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #e9e9e9;
-            font-size: 0.9em;
-        }
-
-        button:hover {
-            background-color: #ddd;
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        /* Header Styling */
-        .app-header {
+        /* Header */
+        header {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background-color: #ffffff;
-            border-bottom: 1px solid #d BDBDBD;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
-            gap: 10px; /* Add gap between items */
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            padding: 8px 15px;
+            border-bottom: 1px solid #dadce0;
+            background-color: #f6f8fc;
+            height: 60px;
+            flex-shrink: 0;
         }
 
         .logo {
             font-weight: bold;
             font-size: 1.4em;
-            color: #2c3e50;
+            color: #5f6368;
+            margin-right: 30px;
+            white-space: nowrap;
         }
 
-        .search-input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            min-width: 200px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .mailbox-name {
-            font-weight: 500;
-            color: #555;
-        }
-
-        /* Main Content Area */
-        .main-content {
+        .search-container {
+            position: relative;
             flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto; /* Allows scrolling if content exceeds viewport */
+            margin-right: 20px;
+            max-width: 720px; /* Limit search bar width like Gmail */
         }
 
-        /* Message List Styling */
-        #message-list {
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            overflow: hidden; /* Keeps borders neat */
-             max-height: calc(100vh - 200px); /* Example max height, adjust as needed */
-            overflow-y: auto; /* Scroll within the list if needed */
+        #searchInput {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid transparent; /* Initially transparent */
+            border-radius: 8px;
+            background-color: #eaf1fb;
+            font-size: 1em;
+            outline: none;
+            transition: background-color 0.2s, box-shadow 0.2s;
         }
 
-        .message-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
+        #searchInput:focus {
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-color: transparent; /* Keep border transparent on focus */
+        }
+
+        /* Autocomplete Styles */
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #dadce0;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border-radius: 0 0 8px 8px; /* Match input radius */
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            display: none; /* Initially hidden */
+        }
+
+        .autocomplete-items div {
+            padding: 10px 15px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .message-item:last-child {
-            border-bottom: none;
-        }
-
-        .message-item:hover {
-            background-color: #f9f9f9;
-        }
-
-        .message-item.unread .message-details {
-             font-weight: bold;
-             color: #111; /* Darker color for unread */
-        }
-         /* Optional: Add a visual marker for unread */
-        .message-item.unread::before {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #3498db; /* Blue dot */
-            border-radius: 50%;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-
-        .message-details {
-            display: flex;
-            gap: 15px; /* Space between sender and subject */
-            flex-grow: 1;
-            overflow: hidden; /* Prevent long text from breaking layout */
-            margin-right: 15px; /* Space before actions */
-        }
-
-        .sender, .subject {
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        .sender {
-            flex-basis: 180px; /* Give sender a fixed width */
-            flex-shrink: 0;
-            color: #555;
+        .autocomplete-items div:last-child {
+            border-bottom: none;
         }
-         .message-item.unread .sender {
-             color: #333; /* Slightly darker sender for unread */
-         }
 
-        .subject {
-            flex-grow: 1; /* Subject takes remaining space */
-            color: #666;
+        .autocomplete-items div:hover {
+            background-color: #f1f3f4;
         }
-        .message-item.unread .subject {
-             color: #222; /* Slightly darker subject for unread */
-         }
+        .autocomplete-items div strong {
+           color: #1a73e8; /* Highlight matching part if needed */
+        }
+
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .header-actions button,
+        .header-actions span {
+            margin-left: 15px;
+            font-size: 0.9em;
+        }
+
+        #newMessageBtn {
+            padding: 10px 20px;
+            background-color: #c2e7ff; /* Light blue like compose */
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #001d35; /* Darker text for contrast */
+            transition: box-shadow .08s linear,min-width .15s cubic-bezier(0.4,0,0.2,1);
+        }
+        #newMessageBtn:hover {
+             box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+             background-color: #c2e7ff;
+        }
+
+
+        #userName {
+            font-weight: 500;
+             color: #444746;
+        }
+
+        #logoutBtn {
+            padding: 8px 12px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #logoutBtn:hover {
+             background-color: #f1b0b7;
+        }
+
+
+        /* Main Content Area */
+        main {
+            flex-grow: 1;
+            overflow-y: auto; /* Allow main content to scroll */
+            padding: 0;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #messageList {
+            flex-grow: 1;
+            min-height: 0; /* Needed for flex-grow in overflow context */
+        }
+
+        /* Message Row Styling */
+        .message-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            border-bottom: 1px solid #e8eaed;
+            cursor: pointer;
+            font-size: 0.9em;
+            position: relative; /* For hover shadow */
+             transition: background-color 0.1s ease-out;
+        }
+
+        .message-row:hover {
+            background-color: #f5f5f5;
+            box-shadow: inset 1px 0 0 #dadce0, inset -1px 0 0 #dadce0, 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+            z-index: 2;
+        }
+
+        .message-sender {
+            min-width: 150px;
+            max-width: 200px;
+            padding-right: 15px;
+            font-weight: normal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+             color: #5f6368;
+        }
+
+        .message-subject {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+             color: #5f6368;
+             font-weight: normal;
+             padding-right: 10px;
+        }
+
+        .message-row.unread .message-sender,
+        .message-row.unread .message-subject {
+            font-weight: bold;
+            color: #202124; /* Darker color for unread */
+        }
 
 
         .message-actions {
+            margin-left: auto;
             display: flex;
-            gap: 8px;
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.1s ease-out;
             flex-shrink: 0; /* Prevent actions from shrinking */
         }
 
-        .message-actions button {
-            padding: 4px 8px;
-            font-size: 0.8em;
-            background-color: transparent;
-            border: 1px solid #ccc;
-        }
-         .message-actions button:hover {
-             background-color: #f0f0f0;
-             border-color: #bbb;
+         .message-row:hover .message-actions {
+             opacity: 1; /* Show actions on hover */
          }
 
-        /* Pagination Styling */
-        #pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 15px 0;
-            margin-top: 15px;
-            gap: 10px;
+        .message-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin-left: 8px;
+            font-size: 1.1em; /* Slightly larger icons/text */
+             color: #5f6368;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             width: 28px;
+             height: 28px;
+             border-radius: 50%;
+        }
+        .message-actions button:hover {
+             background-color: #e8eaed;
+             color: #202124;
+        }
+        /* Simple text icons for demo */
+        .action-reply::before { content: '↩️'; }
+        .action-forward::before { content: '↪️'; }
+        .action-export::before { content: '💾'; }
+        .action-delete::before { content: '🗑️'; }
+
+
+        /* Pagination */
+        #paginationControls {
+            padding: 15px;
+            text-align: right;
+            border-top: 1px solid #e8eaed;
+            background-color: #fff;
+             flex-shrink: 0; /* Prevent pagination from shrinking */
+             font-size: 0.9em;
+             color: #5f6368;
         }
 
-        #page-info {
-            font-size: 0.9em;
-            color: #666;
+        #paginationControls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-left: 10px;
+             color: #5f6368;
+             font-size: 1.2em;
+             border-radius: 4px;
+        }
+        #paginationControls button:hover:not(:disabled) {
+            background-color: #f1f3f4;
         }
 
-        /* Hide elements initially if needed */
-        #prev-page, #next-page {
-            /* display: none; Will be controlled by JS */
+        #paginationControls button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
         }
+         #pageInfo {
+             margin: 0 10px;
+         }
 
     </style>
 </head>
 <body>
 
-    <header class="app-header">
-        <div class="header-left">
-            <span class="logo">WebMail</span>
-            <input type="search" class="search-input" placeholder="Search messages...">
-            <button id="new-message-btn">New Message</button>
+    <header>
+        <div class="logo">M-Mail</div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search mail">
+            <div id="autocompleteList" class="autocomplete-items">
+                </div>
         </div>
-        <div class="header-right">
-            <span class="mailbox-name">Tina Tisch</span>
-            <button id="logout-btn">Logout</button>
+        <div class="header-actions">
+            <button id="newMessageBtn">+ Compose</button>
+            <span id="userName">Tina Tisch</span>
+            <button id="logoutBtn">Logout</button>
         </div>
     </header>
 
-    <main class="main-content">
-        <div id="message-list">
+    <main>
+        <div id="messageList">
             </div>
-        <div id="pagination">
-            <button id="prev-page" disabled>Previous</button>
-            <span id="page-info">Page 1 of 1</span>
-            <button id="next-page" disabled>Next</button>
+         <div id="paginationControls">
+            <span id="pageInfo"></span>
+            <button id="prevPageBtn" title="Previous page" disabled>&lt;</button>
+            <button id="nextPageBtn" title="Next page">&gt;</button>
         </div>
     </main>
 
+
     <script>
-        // --- Mock Data ---
-        const mockMessages = [];
-        const totalMockMessages = 75; // Create more than 50 to test pagination
-        for (let i = 1; i <= totalMockMessages; i++) {
-            mockMessages.push({
-                id: `msg-${i}`,
-                sender: `Sender ${i}`,
-                subject: `Subject for message ${i}: Discussing important topics`,
-                // body: `This is the body content for message ${i}.`, // Keep for future expansion
-                unread: true // Initially all are unread
-            });
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageList = document.getElementById('messageList');
+            const searchInput = document.getElementById('searchInput');
+            const autocompleteList = document.getElementById('autocompleteList');
+            const userNameDisplay = document.getElementById('userName'); // Use if needed
+            const newMessageBtn = document.getElementById('newMessageBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            const pageInfo = document.getElementById('pageInfo');
 
-        // --- Application State ---
-        let messages = [...mockMessages]; // Working copy of messages
-        let currentPage = 1;
-        const messagesPerPage = 50;
+            const MESSAGES_PER_PAGE = 50;
+            let currentPage = 1;
+            let mockMessages = [];
+            let totalMessages = 0;
 
-        // --- DOM Elements ---
-        const messageListContainer = document.getElementById('message-list');
-        const paginationContainer = document.getElementById('pagination');
-        const prevButton = document.getElementById('prev-page');
-        const nextButton = document.getElementById('next-page');
-        const pageInfoSpan = document.getElementById('page-info');
-        const newMessageBtn = document.getElementById('new-message-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // --- Functions ---
-
-        /**
-         * Renders the list of messages for the current page.
-         */
-        function renderMessages() {
-            messageListContainer.innerHTML = ''; // Clear existing messages
-
-            const startIndex = (currentPage - 1) * messagesPerPage;
-            const endIndex = startIndex + messagesPerPage;
-            const paginatedMessages = messages.slice(startIndex, endIndex);
-
-            if (paginatedMessages.length === 0 && currentPage > 1) {
-                // If deleting led to an empty page, go back
-                currentPage--;
-                renderMessages();
-                renderPagination();
-                return;
+            // --- Mock Data Generation ---
+            function generateMockMessages(count) {
+                const senders = ["Alice Appleton", "Bob Baker", "Charlie Chaplin", "Diana Prince", "Ethan Hunt", "Fiona Gallagher", "George Gently", "Hannah Horvath", "Ian Malcolm", "Jane Jetson"];
+                const subjects = ["Meeting Reminder", "Project Update", "Quick Question", "Weekend Plans", "Invoice Attached", "Fwd: Interesting Article", "Your Order Confirmation", "Re: Feedback Request", "Happy Birthday!", "Travel Itinerary"];
+                const messages = [];
+                for (let i = 1; i <= count; i++) {
+                    messages.push({
+                        id: `msg-${i}`,
+                        sender: senders[Math.floor(Math.random() * senders.length)],
+                        subject: subjects[Math.floor(Math.random() * subjects.length)] + (Math.random() > 0.8 ? ` #${i}` : ''), // Add some variation
+                        read: false, // Initially all unread
+                        timestamp: Date.now() - Math.floor(Math.random() * 1000 * 60 * 60 * 24 * 7) // Randomly within last week
+                    });
+                }
+                // Sort by timestamp descending (newest first) - common in email
+                messages.sort((a, b) => b.timestamp - a.timestamp);
+                return messages;
             }
 
-            paginatedMessages.forEach(message => {
-                const messageItem = document.createElement('div');
-                messageItem.classList.add('message-item');
-                messageItem.dataset.messageId = message.id; // Store ID for easy access
-                if (message.unread) {
-                    messageItem.classList.add('unread');
+            // --- Rendering Logic ---
+            function renderMessages() {
+                messageList.innerHTML = ''; // Clear previous messages
+                const startIndex = (currentPage - 1) * MESSAGES_PER_PAGE;
+                const endIndex = startIndex + MESSAGES_PER_PAGE;
+                const messagesToDisplay = mockMessages.slice(startIndex, endIndex);
+
+                if (messagesToDisplay.length === 0 && currentPage > 1) {
+                     // If deletion leads to empty page, go back
+                    currentPage--;
+                    renderMessages();
+                    return;
                 }
 
-                // Message Details (Sender & Subject)
-                const detailsDiv = document.createElement('div');
-                detailsDiv.classList.add('message-details');
-
-                const senderSpan = document.createElement('span');
-                senderSpan.classList.add('sender');
-                senderSpan.textContent = message.sender;
-
-                const subjectSpan = document.createElement('span');
-                subjectSpan.classList.add('subject');
-                subjectSpan.textContent = message.subject;
-
-                detailsDiv.appendChild(senderSpan);
-                detailsDiv.appendChild(subjectSpan);
-
-                // Action Buttons
-                const actionsDiv = document.createElement('div');
-                actionsDiv.classList.add('message-actions');
-
-                const replyBtn = createActionButton('Reply', message.id, handleReply);
-                const forwardBtn = createActionButton('Forward', message.id, handleForward);
-                const exportBtn = createActionButton('Export', message.id, handleExport);
-                const deleteBtn = createActionButton('Delete', message.id, handleDelete);
-
-                actionsDiv.appendChild(replyBtn);
-                actionsDiv.appendChild(forwardBtn);
-                actionsDiv.appendChild(exportBtn);
-                actionsDiv.appendChild(deleteBtn);
-
-                // Append details and actions to the message item
-                messageItem.appendChild(detailsDiv);
-                messageItem.appendChild(actionsDiv);
-
-                // Add click listener to the entire row (excluding buttons)
-                messageItem.addEventListener('click', (event) => {
-                     // Only mark as read if the click wasn't on a button within the actions div
-                    if (!event.target.closest('.message-actions')) {
-                        markMessageAsRead(message.id);
+                messagesToDisplay.forEach(message => {
+                    const row = document.createElement('div');
+                    row.classList.add('message-row');
+                    row.dataset.messageId = message.id;
+                    if (!message.read) {
+                        row.classList.add('unread');
                     }
+
+                    const senderSpan = document.createElement('span');
+                    senderSpan.classList.add('message-sender');
+                    senderSpan.textContent = message.sender;
+
+                    const subjectSpan = document.createElement('span');
+                    subjectSpan.classList.add('message-subject');
+                    subjectSpan.textContent = message.subject;
+
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.classList.add('message-actions');
+
+                    // Action Buttons (non-functional for now)
+                    const replyBtn = createActionButton('Reply', 'action-reply', message.id);
+                    const forwardBtn = createActionButton('Forward', 'action-forward', message.id);
+                    const exportBtn = createActionButton('Export', 'action-export', message.id);
+                    const deleteBtn = createActionButton('Delete', 'action-delete', message.id);
+
+                    actionsDiv.append(replyBtn, forwardBtn, exportBtn, deleteBtn);
+
+                    row.append(senderSpan, subjectSpan, actionsDiv);
+                    messageList.appendChild(row);
                 });
 
-                messageListContainer.appendChild(messageItem);
-            });
-             // Add a message if the list is empty
-            if(messages.length === 0) {
-                 messageListContainer.innerHTML = '<p style="padding: 20px; text-align: center; color: #777;">No messages in this mailbox.</p>';
+                 // Scroll to top of message list when page changes
+                 messageList.scrollTop = 0;
+
+                updatePaginationControls();
             }
-        }
 
-         /**
-         * Helper to create action buttons
-         */
-        function createActionButton(text, messageId, clickHandler) {
-            const button = document.createElement('button');
-            button.textContent = text;
-            button.dataset.messageId = messageId; // Associate button with message ID
-            button.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent row click event (mark as read)
-                clickHandler(messageId);
-            });
-            return button;
-        }
-
-
-        /**
-         * Updates the pagination controls based on current state.
-         */
-        function renderPagination() {
-            const totalMessages = messages.length;
-            const totalPages = Math.ceil(totalMessages / messagesPerPage);
-
-             if (totalMessages === 0) {
-                paginationContainer.style.display = 'none'; // Hide pagination if no messages
-                return;
-            } else {
-                 paginationContainer.style.display = 'flex'; // Show pagination if there are messages
+             function createActionButton(title, className, messageId) {
+                 const button = document.createElement('button');
+                 button.title = title;
+                 button.classList.add(className);
+                 button.dataset.messageId = messageId;
+                 // Add simple alert for now to show interaction
+                  button.addEventListener('click', (event) => {
+                     event.stopPropagation(); // Prevent row click (mark as read)
+                     handleActionClick(title.toLowerCase(), messageId);
+                 });
+                 return button;
              }
 
-            pageInfoSpan.textContent = `Page ${currentPage} of ${totalPages}`;
 
-            prevButton.disabled = currentPage === 1;
-            nextButton.disabled = currentPage === totalPages || totalPages === 0;
+            // --- Pagination Logic ---
+            function updatePaginationControls() {
+                const totalPages = Math.ceil(totalMessages / MESSAGES_PER_PAGE);
+                 const startItem = Math.min((currentPage - 1) * MESSAGES_PER_PAGE + 1, totalMessages);
+                 const endItem = Math.min(currentPage * MESSAGES_PER_PAGE, totalMessages);
 
-        }
-
-        /**
-         * Marks a specific message as read.
-         * @param {string} messageId - The ID of the message to mark as read.
-         */
-        function markMessageAsRead(messageId) {
-            const messageIndex = messages.findIndex(msg => msg.id === messageId);
-            if (messageIndex !== -1 && messages[messageIndex].unread) {
-                messages[messageIndex].unread = false;
-                // Re-render only the affected item for efficiency (more complex)
-                // or re-render the whole list (simpler for now)
-                const messageElement = messageListContainer.querySelector(`.message-item[data-message-id="${messageId}"]`);
-                 if(messageElement) {
-                     messageElement.classList.remove('unread');
+                if (totalMessages === 0) {
+                     pageInfo.textContent = '0-0 of 0';
+                 } else {
+                    pageInfo.textContent = `${startItem}-${endItem} of ${totalMessages}`;
                  }
-                // Note: We don't need to re-render the whole list if just toggling the class
-                // renderMessages(); // Re-rendering list is simpler but less efficient
-                // renderPagination(); // No change needed here
-                 console.log(`Marked message ${messageId} as read.`);
+
+                prevPageBtn.disabled = currentPage === 1;
+                nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
             }
-        }
 
-        // --- Event Handlers ---
-
-        function handleNextPage() {
-            const totalPages = Math.ceil(messages.length / messagesPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderMessages();
-                renderPagination();
+            function goToPrevPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderMessages();
+                }
             }
-        }
 
-        function handlePrevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderMessages();
-                renderPagination();
+            function goToNextPage() {
+                const totalPages = Math.ceil(totalMessages / MESSAGES_PER_PAGE);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderMessages();
+                }
             }
-        }
 
-        // Placeholder Action Handlers
-        function handleNewMessage() {
-            alert('Action: Create New Message (Not implemented)');
-            console.log('Action: Create New Message');
-        }
+            // --- Message Interaction Logic ---
+            function handleMessageClick(event) {
+                 const row = event.target.closest('.message-row');
+                 if (!row) return; // Clicked outside a row
 
-        function handleLogout() {
-            alert('Action: Logout (Not implemented)');
-            console.log('Action: Logout');
-             // In a real app, this would redirect or clear session state
-        }
+                 const messageId = row.dataset.messageId;
+                 const message = mockMessages.find(m => m.id === messageId);
 
-        function handleReply(messageId) {
-            alert(`Action: Reply to message ${messageId} (Not implemented)`);
-            console.log(`Action: Reply to message ${messageId}`);
-        }
-
-        function handleForward(messageId) {
-            alert(`Action: Forward message ${messageId} (Not implemented)`);
-            console.log(`Action: Forward message ${messageId}`);
-        }
-
-        function handleExport(messageId) {
-            alert(`Action: Export message ${messageId} (Not implemented)`);
-            console.log(`Action: Export message ${messageId}`);
-        }
-
-        function handleDelete(messageId) {
-            // Find the index of the message to delete
-            const messageIndex = messages.findIndex(msg => msg.id === messageId);
-
-            if (messageIndex !== -1) {
-                // Remove the message from the array
-                messages.splice(messageIndex, 1);
-                console.log(`Action: Delete message ${messageId}`);
-
-                // Re-render the current page
-                renderMessages();
-                // Update pagination as total messages changed
-                renderPagination();
-                 alert(`Action: Delete message ${messageId} (Item removed from view)`);
-            } else {
-                console.warn(`Tried to delete message ${messageId}, but it was not found.`);
+                 if (message && !message.read) {
+                     message.read = true;
+                     row.classList.remove('unread');
+                     // In a real app, you'd notify the backend here.
+                     console.log(`Marked message ${messageId} as read.`);
+                 }
+                 // Add logic here to display message details if needed in future
+                 console.log(`Clicked message ${messageId}`);
             }
-        }
+
+             function handleActionClick(action, messageId) {
+                 console.log(`Action "${action}" clicked for message ${messageId}`);
+                 // Placeholder for future actions
+                 alert(`Action: ${action} on message ${messageId}\n(This action is not yet implemented)`);
+
+                 // Example: Implement Delete
+                 if (action === 'delete') {
+                     if (confirm(`Are you sure you want to delete message ${messageId}?`)) {
+                        mockMessages = mockMessages.filter(m => m.id !== messageId);
+                        totalMessages = mockMessages.length;
+                        // Re-render the current page
+                        renderMessages();
+                     }
+                 }
+            }
+
+            // --- Search Autocomplete Logic ---
+            const baseAutocompleteItems = [
+                { key: "messages", value: "all" },
+                { key: "messages", value: "unread" },
+                { key: "mailbox", value: "Tina Tisch" },
+                { key: "mailbox", value: "Bernd Bank" },
+                { key: "mailbox", value: "Violeta Jarmusch" },
+                { key: "folder", value: "inbox" },
+                { key: "folder", value: "outbox" },
+                { key: "folder", value: "sent" },
+                { key: "folder", value: "trash" },
+                { key: "label", value: "urgent" },
+                { key: "label", value: "done" },
+            ];
+
+            function showAutocomplete() {
+                const query = searchInput.value.toLowerCase().trim();
+                autocompleteList.innerHTML = ''; // Clear previous items
+
+                let itemsToShow = [];
+
+                // Filter base items
+                if (query) {
+                    itemsToShow = baseAutocompleteItems.filter(item =>
+                        item.value.toLowerCase().includes(query)
+                    );
+                } else {
+                     // Show all base items if query is empty (on focus)
+                     itemsToShow = [...baseAutocompleteItems];
+                 }
 
 
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add Event Listeners
-            prevButton.addEventListener('click', handlePrevPage);
-            nextButton.addEventListener('click', handleNextPage);
-            newMessageBtn.addEventListener('click', handleNewMessage);
-            logoutBtn.addEventListener('click', handleLogout);
+                // Add dynamic items if there's a query
+                if (query) {
+                    itemsToShow.unshift( // Add to the beginning
+                        { key: "subject", value: query },
+                        { key: "sender", value: query }
+                    );
+                }
 
-             // Initial Render
-            renderMessages();
-            renderPagination();
+                if (itemsToShow.length > 0) {
+                    itemsToShow.forEach(item => {
+                        const div = document.createElement('div');
+                        // Basic highlighting (optional)
+                        const valueDisplay = item.value.replace(
+                            new RegExp(`(${query})`, 'gi'),
+                            '<strong>$1</strong>'
+                         );
+                        div.innerHTML = `${item.key}: ${query ? valueDisplay : item.value}`;
+                        div.dataset.value = `${item.key}:${item.value}`; // Store full value if needed
+                        div.addEventListener('click', () => {
+                            searchInput.value = `${item.key}:${item.value}`;
+                            autocompleteList.style.display = 'none';
+                            console.log(`Selected search: ${searchInput.value}`);
+                            // Here you would trigger the actual search filtering logic
+                             alert(`Search initiated for: ${searchInput.value}\n(Search filtering not implemented)`);
+                        });
+                        autocompleteList.appendChild(div);
+                    });
+                    autocompleteList.style.display = 'block';
+                } else {
+                    autocompleteList.style.display = 'none';
+                }
+            }
+
+             function hideAutocomplete() {
+                 // Delay hiding to allow click event on items to register
+                 setTimeout(() => {
+                     autocompleteList.style.display = 'none';
+                 }, 150);
+             }
+
+
+            // --- Event Listeners ---
+            prevPageBtn.addEventListener('click', goToPrevPage);
+            nextPageBtn.addEventListener('click', goToNextPage);
+            messageList.addEventListener('click', handleMessageClick);
+
+            searchInput.addEventListener('focus', showAutocomplete);
+            searchInput.addEventListener('input', showAutocomplete);
+            searchInput.addEventListener('blur', hideAutocomplete);
+
+             // Close autocomplete if clicked outside
+            document.addEventListener('click', (event) => {
+                if (!searchInput.contains(event.target) && !autocompleteList.contains(event.target)) {
+                     autocompleteList.style.display = 'none';
+                 }
+             });
+
+            // Dummy listeners for header buttons
+             newMessageBtn.addEventListener('click', () => alert('Compose new message (not implemented)'));
+             logoutBtn.addEventListener('click', () => alert('Logout (not implemented)'));
+
+
+            // --- Initialization ---
+            mockMessages = generateMockMessages(75); // Generate example messages (more than one page)
+            totalMessages = mockMessages.length;
+            renderMessages(); // Initial render
         });
-
     </script>
 
 </body>

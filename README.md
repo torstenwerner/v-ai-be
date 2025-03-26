@@ -30,6 +30,7 @@ Initially the message overview should be designed.
 ### Prompt
 
 Please create a web application where the user can read, create, and answer messages similar to email messages.
+The design should resemble the gmail interface where it makes sense.
 It should be a single HTML file with CSS and Javascript embedded.
 The actual messages should be mocked.
 The application should render the message overview.
@@ -43,3 +44,21 @@ Initially all messages should be unread.
 When clicking a message its unread status should change into read.
 Each message should have actions for answering, forwarding, exporting, and deleting it.
 These actions should not do anything at the moment.
+The search input field should provide a pull down menu with autocompletion items.
+The menu item have a format "key: value".
+As soon as the user focuses the search field it should show these menu items.
+- messages: all
+- messages: unread
+- mailbox: Tina Tisch
+- mailbox: Bernd Bank
+- mailbox: Violeta Jarmusch
+- folder: inbox
+- folder: outbox
+- folder: sent
+- folder: trash
+- label: urgent
+- label: done
+After the user has entered a search query e.g. 'foo' the menu items should be filtered to show only the items with a value matching 'foo'.
+But some additional menu items should be added:
+- sender: foo
+- subject: foo
