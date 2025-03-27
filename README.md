@@ -60,3 +60,22 @@ One more menu group should be added to the filtered drop down menu:
 - group 'filter' with menu items 'sender: Ban', 'subject: Ban' where 'Ban' should be the search term.
 
 The search field should have an icon button to reset the search term if it is not empty.
+
+
+## Wordle
+
+Please create an application for a Wordle puzzle.
+It should be a single HTML file with CSS and Javascript embedded.
+The language of the words should be german.
+A random puzzle should be displayed initially.
+There should be a button to reset the current puzzle and start with a now random puzzle.
+
+It should support keyboard input.
+The first cell in the currently active row should be focused by default.
+The currently focused cell should have a colorful border.
+Typing a letter should replace the current value of the cell and move the focus to the next cell.
+At the last cell of the current row the focus should wrap to the first cell of the same row.
+A hint should be displayed if all 5 cells of the current row are filled and it is not submitted yet: "Mit <Enter> abschicken."
+Hitting Enter after filling all 5 cells of the current row should submit it.
+
+Show a hint below the virtual keyboard: "Geben Sie bitte SS anstelle von ß ein."
