@@ -66,6 +66,8 @@ The search field should have an icon button to reset the search term if it is no
 
 ### Prompt for the word list
 
+This seems to be hard.
+
 Please create a list of unique german 5 letter words for a german variant of the Wordle puzzle game.
 The list should have a size of about 200 words.
 The words should be all uppercase.
@@ -73,19 +75,20 @@ The letter ß should be replaced by SS.
 For example: the word 'heiß' would change into 'HEISS'.
 The resulting word is valid if it has 5 letters.
 Umlauts should be supported without change for example: 'WÄRME'.
+The list should contain only real german words.
+Longer words shortened to 5 letters are not acceptable.
 Output the list in a codebox so that it can be copied into a file 'wordlist.txt'.
 
 ### Prompt for the application
 
-Please create an application for a Wordle puzzle.
+Please create an application for a german variant of the Wordle puzzle.
 The german title is "Wortliste"
 It should be a single HTML file with CSS and Javascript embedded.
-The language of the words should be german.
-The list of words should contain german 5 letter words only.
-The ß should be replaced by SS but umlauts should be supported natively.
+A list of suitable german words should be loaded from the file wordlist.txt which contains one upper case word per line.
+The letter ß has been changed into SS but umlauts are supported without change.
 
 A random puzzle should be displayed initially.
-There should be a button to reset the current puzzle and start with a now random puzzle.
+There should be a button to reset the current puzzle and start with a now random word.
 
 It should support keyboard input.
 The first cell in the currently active row should be focused by default.
