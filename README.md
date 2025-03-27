@@ -84,7 +84,7 @@ Output the list in a codebox so that it can be copied into a file 'wordlist.txt'
 Please create an application for a german variant of the Wordle puzzle.
 The german title is "Wortliste"
 It should be a single HTML file with CSS and Javascript embedded.
-A list of suitable german words should be loaded from the file wordlist.txt which contains one upper case word per line.
+A list of suitable german words should be loaded from the URL https://torstenwerner.github.io/v-ai-be/wordlist.txt which contains one upper case word per line.
 The letter ß has been changed into SS but umlauts are supported without change.
 
 A random puzzle should be displayed initially.
@@ -101,9 +101,14 @@ Hitting Enter after filling all 5 cells of the current row should submit it.
 It should provide a virtual keyboard with square keys.
 Show a hint below the virtual keyboard: "Geben Sie bitte SS anstelle von ß ein."
 
+It should work nicely both in the desktop browser and the mobile browser.
+It should use vertical vs. horizontal layout dependending on the portrait or landscape mode of the mobile screen.
+
+
+### Skipping additional requirement
+
+The wordlist is too small.
+
 This error message is shown if the user submits an invalid word: "Kein gültiges Wort!"
 The current row does not change for invalid words.
 The user must change at least one cell in the current before submitting is allowed again.
-
-It should work nicely both in the desktop browser and the mobile browser.
-It should use vertical vs. horizontal layout dependending on the portrait or landscape mode of the mobile screen.
