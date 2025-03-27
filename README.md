@@ -64,9 +64,26 @@ The search field should have an icon button to reset the search term if it is no
 
 ## Wordle
 
+### Prompt for the word list
+
+Please create a list of unique german 5 letter words for a german variant of the Wordle puzzle game.
+The list should have a size of about 200 words.
+The words should be all uppercase.
+The letter ß should be replaced by SS.
+For example: the word 'heiß' would change into 'HEISS'.
+The resulting word is valid if it has 5 letters.
+Umlauts should be supported without change for example: 'WÄRME'.
+Output the list in a codebox so that it can be copied into a file 'wordlist.txt'.
+
+### Prompt for the application
+
 Please create an application for a Wordle puzzle.
+The german title is "Wortliste"
 It should be a single HTML file with CSS and Javascript embedded.
 The language of the words should be german.
+The list of words should contain german 5 letter words only.
+The ß should be replaced by SS but umlauts should be supported natively.
+
 A random puzzle should be displayed initially.
 There should be a button to reset the current puzzle and start with a now random puzzle.
 
@@ -78,4 +95,12 @@ At the last cell of the current row the focus should wrap to the first cell of t
 A hint should be displayed if all 5 cells of the current row are filled and it is not submitted yet: "Mit <Enter> abschicken."
 Hitting Enter after filling all 5 cells of the current row should submit it.
 
+It should provide a virtual keyboard with square keys.
 Show a hint below the virtual keyboard: "Geben Sie bitte SS anstelle von ß ein."
+
+This error message is shown if the user submits an invalid word: "Kein gültiges Wort!"
+The current row does not change for invalid words.
+The user must change at least one cell in the current before submitting is allowed again.
+
+It should work nicely both in the desktop browser and the mobile browser.
+It should use vertical vs. horizontal layout dependending on the portrait or landscape mode of the mobile screen.
